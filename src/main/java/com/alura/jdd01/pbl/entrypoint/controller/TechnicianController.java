@@ -3,17 +3,21 @@ package com.alura.jdd01.pbl.entrypoint.controller;
 import com.alura.jdd01.pbl.domain.entity.Technician;
 import com.alura.jdd01.pbl.entrypoint.dto.CreateTechnicianRequest;
 import com.alura.jdd01.pbl.entrypoint.dto.TechnicianResponse;
-import com.alura.jdd01.pbl.usecase.CreateTechnicianUseCase;
+import com.alura.jdd01.pbl.usecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/technicians")
 @RequiredArgsConstructor
 public class TechnicianController {
     private final CreateTechnicianUseCase createTechnicianUseCase;
+    private final FindTechnicianByIdUseCase findTechnicianByIdUseCase;
+    private final FindAllTechniciansUseCase findAllTechniciansUseCase;
+    private final DeleteTechnicianUseCase deleteTechnicianUseCase;
     
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -24,5 +28,24 @@ public class TechnicianController {
                 request.getPhone()
         );
         return TechnicianResponse.from(technician);
+    }
+    
+    @GetMapping
+    public List<TechnicianResponse> findAll() {
+        return findAllTechniciansUseCase.execute().stream()
+                .map(TechnicianResponse::from)
+                .toList();
+    }
+    
+    @GetMapping("/{id}")
+    public TechnicianResponse findById(@PathVariable Long id) {
+        Technician technician = findTechnicianByIdUseCase.execute(id);
+        return TechnicianResponse.from(technician);
+    }
+    
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        deleteTechnicianUseCase.execute(id);
     }
 }

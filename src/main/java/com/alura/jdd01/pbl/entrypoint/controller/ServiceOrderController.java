@@ -3,12 +3,12 @@ package com.alura.jdd01.pbl.entrypoint.controller;
 import com.alura.jdd01.pbl.domain.entity.ServiceOrder;
 import com.alura.jdd01.pbl.entrypoint.dto.CreateServiceOrderRequest;
 import com.alura.jdd01.pbl.entrypoint.dto.ServiceOrderResponse;
-import com.alura.jdd01.pbl.usecase.CreateServiceOrderUseCase;
-import com.alura.jdd01.pbl.usecase.CloseServiceOrderUseCase;
+import com.alura.jdd01.pbl.usecase.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/service-orders")
@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class ServiceOrderController {
     private final CreateServiceOrderUseCase createServiceOrderUseCase;
     private final CloseServiceOrderUseCase closeServiceOrderUseCase;
+    private final FindServiceOrderByIdUseCase findServiceOrderByIdUseCase;
+    private final FindAllServiceOrdersUseCase findAllServiceOrdersUseCase;
+    private final DeleteServiceOrderUseCase deleteServiceOrderUseCase;
     
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -28,9 +31,28 @@ public class ServiceOrderController {
         return ServiceOrderResponse.from(serviceOrder);
     }
     
+    @GetMapping
+    public List<ServiceOrderResponse> findAll() {
+        return findAllServiceOrdersUseCase.execute().stream()
+                .map(ServiceOrderResponse::from)
+                .toList();
+    }
+    
+    @GetMapping("/{id}")
+    public ServiceOrderResponse findById(@PathVariable Long id) {
+        ServiceOrder serviceOrder = findServiceOrderByIdUseCase.execute(id);
+        return ServiceOrderResponse.from(serviceOrder);
+    }
+    
     @PatchMapping("/{id}/close")
     public ServiceOrderResponse close(@PathVariable Long id) {
         ServiceOrder serviceOrder = closeServiceOrderUseCase.execute(id);
         return ServiceOrderResponse.from(serviceOrder);
+    }
+    
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        deleteServiceOrderUseCase.execute(id);
     }
 }
