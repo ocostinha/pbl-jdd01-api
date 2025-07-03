@@ -35,6 +35,13 @@ public class ServiceOrder {
         return new ServiceOrder(id, entryDate, LocalDateTime.now(), "FECHADO", equipment, technicianId, problemDescription);
     }
     
+    public ServiceOrder update(String equipment, Long technicianId, String problemDescription) {
+        validateEquipment(equipment);
+        validateTechnicianId(technicianId);
+        validateProblemDescription(problemDescription);
+        return new ServiceOrder(this.id, this.entryDate, this.exitDate, this.status, equipment, technicianId, problemDescription);
+    }
+    
     private static void validateEquipment(String equipment) {
         if (equipment == null || equipment.trim().isEmpty()) {
             throw new IllegalArgumentException("Equipamento é obrigatório");

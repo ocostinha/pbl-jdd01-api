@@ -2,6 +2,7 @@ package com.alura.jdd01.pbl.entrypoint.controller;
 
 import com.alura.jdd01.pbl.domain.entity.ServiceOrder;
 import com.alura.jdd01.pbl.entrypoint.dto.CreateServiceOrderRequest;
+import com.alura.jdd01.pbl.entrypoint.dto.UpdateServiceOrderRequest;
 import com.alura.jdd01.pbl.entrypoint.dto.ServiceOrderResponse;
 import com.alura.jdd01.pbl.usecase.*;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ public class ServiceOrderController {
     private final CloseServiceOrderUseCase closeServiceOrderUseCase;
     private final FindServiceOrderByIdUseCase findServiceOrderByIdUseCase;
     private final FindAllServiceOrdersUseCase findAllServiceOrdersUseCase;
+    private final UpdateServiceOrderUseCase updateServiceOrderUseCase;
     private final DeleteServiceOrderUseCase deleteServiceOrderUseCase;
     
     @PostMapping
@@ -41,6 +43,17 @@ public class ServiceOrderController {
     @GetMapping("/{id}")
     public ServiceOrderResponse findById(@PathVariable Long id) {
         ServiceOrder serviceOrder = findServiceOrderByIdUseCase.execute(id);
+        return ServiceOrderResponse.from(serviceOrder);
+    }
+    
+    @PutMapping("/{id}")
+    public ServiceOrderResponse update(@PathVariable Long id, @Valid @RequestBody UpdateServiceOrderRequest request) {
+        ServiceOrder serviceOrder = updateServiceOrderUseCase.execute(
+                id,
+                request.getEquipment(),
+                request.getTechnicianId(),
+                request.getProblemDescription()
+        );
         return ServiceOrderResponse.from(serviceOrder);
     }
     
